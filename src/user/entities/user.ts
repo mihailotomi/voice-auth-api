@@ -1,12 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { Gender } from './gender';
-import { Role } from './role';
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Gender } from "./gender";
+import { Role } from "./role";
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn({
-    type: 'bigint',
-    name: 'user_id',
+    type: "bigint",
+    name: "user_id",
   })
   id: number;
 
@@ -24,7 +24,13 @@ export class User {
 
   @Column({
     nullable: false,
-    type: 'char',
+    length: 50,
+  })
+  email: string;
+
+  @Column({
+    nullable: false,
+    type: "char",
     length: 13,
     unique: true,
   })
@@ -37,20 +43,20 @@ export class User {
   })
   username: string;
 
-  @Column({ nullable: false, type: 'text' })
+  @Column({ nullable: false, type: "text" })
   password: string;
 
   @Column({
     nullable: false,
     enum: Role,
-    type: 'smallint',
+    type: "smallint",
   })
   role: Role;
 
   @Column({
     nullable: false,
     enum: Gender,
-    type: 'smallint',
+    type: "smallint",
   })
   gender: Gender;
 }

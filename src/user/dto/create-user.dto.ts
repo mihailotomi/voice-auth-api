@@ -1,14 +1,9 @@
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsNumber,
-  IsNumberString,
-  IsString,
-  Length,
-} from 'class-validator';
-import { Gender } from '../entities/gender';
-import { Role } from '../entities/role';
-import { Password } from '../validators/password';
+import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsNumberString, IsString, Length, Validate } from "class-validator";
+import { Gender } from "../entities/gender";
+import { Role } from "../entities/role";
+import { EmailValidator } from "../validators/email.validator";
+import { IdentifierValidator } from "../validators/identifier.validator";
+import { PasswordValidator } from "../validators/password.validator";
 
 export class CreateUserDto {
   @IsString()
@@ -19,11 +14,13 @@ export class CreateUserDto {
   @IsNotEmpty()
   lastName: string;
 
-  @IsNumberString()
-  @Length(13)
+  @EmailValidator()
+  email: string;
+
+  @IdentifierValidator()
   identifier: string;
 
-  @Password()
+  @PasswordValidator()
   password: string;
 
   @IsNumber()
