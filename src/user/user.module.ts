@@ -5,11 +5,12 @@ import { EmailAvailableConstraint } from "./constraints/email-available.constrai
 import { IdentifierAvailableConstraint } from "./constraints/identifier-available.constraint";
 import { UserController } from "./controllers/user.controller";
 import { User } from "./entities/user";
+import { AuthService } from "./services/auth.service";
 import { UserService } from "./services/user.service";
 
 @Module({
   imports: [TypeOrmModule.forFeature([User]), HashingModule],
   controllers: [UserController],
-  providers: [UserService, EmailAvailableConstraint, IdentifierAvailableConstraint],
+  providers: [UserService, AuthService],
 })
 export class UserModule {}
