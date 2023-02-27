@@ -1,13 +1,24 @@
-import { Body, Controller, Post, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Post,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { CreateUserDto } from "../dto/create-user.dto";
 import { LoginUserDto } from "../dto/login-user.dto";
+import { LocalAuthGuard } from "../guards/local-auth.guard";
 import { AuthService } from "../services/auth.service";
 import { UserService } from "../services/user.service";
 
 @Controller("user")
 export class UserController {
-  constructor(private userService: UserService, private authService: AuthService) {}
+  constructor(
+    private userService: UserService,
+    private authService: AuthService
+  ) {}
 
   //* CREATE USER
   @Post("create")
@@ -17,12 +28,16 @@ export class UserController {
   }
 
   //* LOGIN USER
-  @UseGuards(AuthGuard("local"))
+  @UseGuards(LocalAuthGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
   @Post("login")
   async login(@Body() loginUserDto: LoginUserDto) {
-    const user = await this.authService.validateUser(loginUserDto.username, loginUserDto.password);
+    const user = await this.authService.validateUser(
+      loginUserDto.username,
+      loginUserDto.password
+    );
     // const token = this.authService.generateUserToken(user);
     // return { user, token };
+    return true;
   }
 }
