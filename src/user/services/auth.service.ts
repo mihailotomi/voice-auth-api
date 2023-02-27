@@ -1,9 +1,5 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from "@nestjs/common";
-//   import { JwtService } from '@nestjs/jwt';
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
 
 import { HashingService } from "src/hashing/hashing.service";
 import { User } from "../entities/user";
@@ -13,13 +9,13 @@ import { UserService } from "./user.service";
 export class AuthService {
   constructor(
     private userService: UserService,
-    private hashingService: HashingService //   private jwtService: JwtService,
+    private hashingService: HashingService,
+    private jwtService: JwtService
   ) {}
 
   async validateUser(username: string, password: string) {
     const user = await this.userService.findOne({ username });
 
-    //we need this check because the pipes are executed after guards
     if (!user) {
       throw new UnauthorizedException();
     }
@@ -36,12 +32,12 @@ export class AuthService {
     return user;
   }
 
-  // generateUserToken(payload: User) {
-  //   return this.jwtService.sign({
-  //     email: payload.email,
-  //     sub: payload.id,
-  //   });
-  // }
+  generateUserToken(payload: User) {
+    return this.jwtService.sign({
+      email: payload.email,
+      sub: payload.id,
+    });
+  }
 
   // generateEmailVerifyToken(payload: User) {
   //   return this.jwtService.sign({ id: payload.id });

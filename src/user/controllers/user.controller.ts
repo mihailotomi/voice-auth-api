@@ -4,8 +4,10 @@ import {
   Post,
   UseGuards,
   UsePipes,
+  Request,
   ValidationPipe,
 } from "@nestjs/common";
+import { Get } from "@nestjs/common/decorators";
 import { AuthGuard } from "@nestjs/passport";
 import { CreateUserDto } from "../dto/create-user.dto";
 import { LoginUserDto } from "../dto/login-user.dto";
@@ -36,8 +38,16 @@ export class UserController {
       loginUserDto.username,
       loginUserDto.password
     );
-    // const token = this.authService.generateUserToken(user);
-    // return { user, token };
-    return true;
+    const token = this.authService.generateUserToken(user);
+    return { user, token };
+  }
+
+  //* GET USER PROFILE
+  @UseGuards(AuthGuard("jwt"))
+  @Get("profile")
+  //@UseInterceptors(TemporaryPasswordInterceptor)
+  //@UseFilters(new ForbiddenFilter())
+  async profile(@Request() req: { user: any }) {
+    return req.user;
   }
 }

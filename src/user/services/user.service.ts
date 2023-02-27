@@ -13,8 +13,14 @@ export class UserService {
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
-    const hashedPassword = await this.hashingService.hash(createUserDto.password);
-    const payload = { ...createUserDto, username: this.inferUsername(createUserDto), password: hashedPassword };
+    const hashedPassword = await this.hashingService.hash(
+      createUserDto.password
+    );
+    const payload = {
+      ...createUserDto,
+      username: this.inferUsername(createUserDto),
+      password: hashedPassword,
+    };
 
     const newUser = this.userRepository.create(payload);
 
@@ -23,6 +29,10 @@ export class UserService {
 
   async findOne(payload: Partial<User>) {
     return await this.userRepository.findOneBy(payload);
+  }
+
+  async findById(id: number) {
+    return await this.userRepository.findOneBy({ id });
   }
 
   inferUsername(payload: Pick<User, "lastName" | "identifier">) {
