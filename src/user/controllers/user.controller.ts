@@ -5,12 +5,15 @@ import {
   UseGuards,
   UsePipes,
   Request,
+  HttpCode,
   ValidationPipe,
 } from "@nestjs/common";
 import { Get } from "@nestjs/common/decorators";
 import { AuthGuard } from "@nestjs/passport";
 import { CreateUserDto } from "../dto/create-user.dto";
 import { LoginUserDto } from "../dto/login-user.dto";
+import { ResetPasswordDto } from "../dto/reset-password.dto";
+import { User } from "../entities/user";
 import { LocalAuthGuard } from "../guards/local-auth.guard";
 import { AuthService } from "../services/auth.service";
 import { UserService } from "../services/user.service";
@@ -49,5 +52,23 @@ export class UserController {
   //@UseFilters(new ForbiddenFilter())
   async profile(@Request() req: { user: any }) {
     return req.user;
+  }
+
+  //* RESET PASSWORD
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @Post("reset-password")
+  @HttpCode(200)
+  async resetPassword(@Body() { email }: ResetPasswordDto) {
+    const user = await this.userService.findOne({ email });
+
+    const updatedUser = await this.userService.resetPassword(user as User);
+
+    // await this.mailService.sendPasswordResetEmail(
+    //   user.email,
+    //   user.firstName,
+    //   updatedUser.temporaryPassword,
+    // );
+
+    return;
   }
 }

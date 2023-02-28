@@ -1,6 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { Gender } from "./gender";
 import { Role } from "./role";
+import { UserStatus } from "./user-status";
 
 @Entity()
 export class User {
@@ -59,4 +60,11 @@ export class User {
     type: "smallint",
   })
   gender: Gender;
+
+  @Column({
+    nullable: false,
+    enum: UserStatus,
+    type: "smallint",
+  })
+  status: UserStatus;
 }

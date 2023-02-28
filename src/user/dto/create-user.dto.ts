@@ -1,4 +1,13 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsNumberString, IsString, Length, Validate } from "class-validator";
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsNumberString,
+  IsString,
+  Length,
+  Validate,
+} from "class-validator";
 import { Gender } from "../entities/gender";
 import { Role } from "../entities/role";
 import { EmailValidator } from "../validators/email.validator";
