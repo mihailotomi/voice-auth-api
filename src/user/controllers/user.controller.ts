@@ -1,15 +1,7 @@
-import {
-  Body,
-  Controller,
-  Post,
-  UseGuards,
-  UsePipes,
-  Request,
-  HttpCode,
-  ValidationPipe,
-} from "@nestjs/common";
+import { Body, Controller, Post, UseGuards, UsePipes, Request, HttpCode, ValidationPipe } from "@nestjs/common";
 import { Get } from "@nestjs/common/decorators";
 import { AuthGuard } from "@nestjs/passport";
+import { MailService } from "src/mail/mail.service";
 import { CreateUserDto } from "../dto/create-user.dto";
 import { LoginUserDto } from "../dto/login-user.dto";
 import { ResetPasswordDto } from "../dto/reset-password.dto";
@@ -20,10 +12,7 @@ import { UserService } from "../services/user.service";
 
 @Controller("user")
 export class UserController {
-  constructor(
-    private userService: UserService,
-    private authService: AuthService
-  ) {}
+  constructor(private userService: UserService, private authService: AuthService, private mailService: MailService) {}
 
   //* CREATE USER
   @Post("create")
@@ -37,10 +26,7 @@ export class UserController {
   @UsePipes(new ValidationPipe({ transform: true }))
   @Post("login")
   async login(@Body() loginUserDto: LoginUserDto) {
-    const user = await this.authService.validateUser(
-      loginUserDto.username,
-      loginUserDto.password
-    );
+    const user = await this.authService.validateUser(loginUserDto.username, loginUserDto.password);
     const token = this.authService.generateUserToken(user);
     return { user, token };
   }
@@ -59,15 +45,11 @@ export class UserController {
   @Post("reset-password")
   @HttpCode(200)
   async resetPassword(@Body() { email }: ResetPasswordDto) {
-    const user = await this.userService.findOne({ email });
+    const user = (await this.userService.findOne({ email })) as User;
 
-    const updatedUser = await this.userService.resetPassword(user as User);
+    const temporaryPassword = await this.userService.resetPassword(user);
 
-    // await this.mailService.sendPasswordResetEmail(
-    //   user.email,
-    //   user.firstName,
-    //   updatedUser.temporaryPassword,
-    // );
+    await this.mailService.sendPasswordResetEmail(user.email, user.firstName, temporaryPassword);
 
     return;
   }

@@ -16,9 +16,7 @@ export class UserService {
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
-    const hashedPassword = await this.hashingService.hash(
-      createUserDto.password
-    );
+    const hashedPassword = await this.hashingService.hash(createUserDto.password);
     const payload = {
       ...createUserDto,
       username: this.inferUsername(createUserDto),
@@ -48,9 +46,11 @@ export class UserService {
 
     const hashedPassword = await this.hashingService.hash(temporaryPassword);
 
-    return await this.userRepository.update(user.id, {
+    await this.userRepository.update(user.id, {
       password: hashedPassword,
       status: UserStatus.TemporaryPassword,
     });
+
+    return temporaryPassword;
   }
 }

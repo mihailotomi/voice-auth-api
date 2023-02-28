@@ -4,6 +4,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { HashingModule } from "src/hashing/hashing.module";
+import { MailModule } from "src/mail/mail.module";
 import { EmailAvailableConstraint } from "./constraints/email-available.constraint";
 import { EmailExistsConstraint } from "./constraints/email-exists.constraint";
 import { IdentifierAvailableConstraint } from "./constraints/identifier-available.constraint";
@@ -21,6 +22,7 @@ import { LocalStrategy } from "./strategies/local.strategy";
     TypeOrmModule.forFeature([User]),
     HashingModule,
     PassportModule,
+    MailModule,
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => {
         return {

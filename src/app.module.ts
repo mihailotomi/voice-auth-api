@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user/entities/user';
 import { UserModule } from './user/user.module';
 import { HashingModule } from './hashing/hashing.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { HashingModule } from './hashing/hashing.module';
       inject: [ConfigService],
     }),
     HashingModule,
+    MailModule,
   ],
 })
 export class AppModule {}
