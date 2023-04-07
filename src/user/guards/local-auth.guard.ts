@@ -5,16 +5,9 @@ import { validate } from "class-validator";
 import { LoginUserDto } from "../dto/login-user.dto";
 
 export class LocalAuthGuard extends AuthGuard("local") {
-  handleRequest<TUser = any>(
-    err: any,
-    user: TUser,
-    info: any,
-    context: ExecutionContext,
-    status?: any
-  ): TUser | void {
+  handleRequest<TUser = any>(err: any, user: TUser, info: any, context: ExecutionContext, status?: any): TUser | void {
     const request = context.switchToHttp().getRequest();
     const body = plainToInstance(LoginUserDto, request.body);
-    const { username, password } = body;
 
     ////guards demand manual validation
     validate(body).then(() => user);

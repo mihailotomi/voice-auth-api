@@ -16,6 +16,8 @@ import { PasswordGeneratorService } from "./services/password-generator.service"
 import { UserService } from "./services/user.service";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { LocalStrategy } from "./strategies/local.strategy";
+import { PasswordResetStrategy } from "./strategies/password-reset.strategy";
+import { EmailVerifyStrategy } from "./strategies/email-verify.strategy";
 
 @Module({
   imports: [
@@ -51,6 +53,8 @@ import { LocalStrategy } from "./strategies/local.strategy";
     //// strategies
     LocalStrategy,
     JwtStrategy,
+    PasswordResetStrategy,
+    EmailVerifyStrategy,
   ],
 })
 export class UserModule {}

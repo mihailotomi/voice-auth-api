@@ -1,10 +1,12 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { Gender } from "./gender";
-import { Role } from "./role";
-import { UserStatus } from "./user-status";
+import { Gender } from "../enums/gender";
+import { Role } from "../enums/role";
+import { UserStatus } from "../enums/user-status";
+import { Exclude } from "class-transformer";
 
 @Entity()
 export class User {
+  @Exclude()
   @PrimaryGeneratedColumn({
     type: "bigint",
     name: "user_id",
@@ -44,6 +46,7 @@ export class User {
   })
   username: string;
 
+  @Exclude()
   @Column({ nullable: false, type: "text" })
   password: string;
 

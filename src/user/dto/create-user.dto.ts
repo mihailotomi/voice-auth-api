@@ -1,7 +1,7 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsNumberString, IsString, Length, Validate } from "class-validator";
 import { EmailAvailableConstraint } from "../constraints/email-available.constraint";
-import { Gender } from "../entities/gender";
-import { Role } from "../entities/role";
+import { Gender } from "../enums/gender";
+import { Role } from "../enums/role";
 import { EmailValidator } from "../validators/email.validator";
 import { IdentifierValidator } from "../validators/identifier.validator";
 import { PasswordValidator } from "../validators/password.validator";

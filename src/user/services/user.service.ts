@@ -4,16 +4,11 @@ import { HashingService } from "src/hashing/hashing.service";
 import { CreateUserDto } from "src/user/dto/create-user.dto";
 import { User } from "src/user/entities/user";
 import { Repository } from "typeorm";
-import { UserStatus } from "../entities/user-status";
-import { PasswordGeneratorService } from "./password-generator.service";
+import { UserStatus } from "../enums/user-status";
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-    private hashingService: HashingService,
-    private passGenService: PasswordGeneratorService
-  ) {}
+  constructor(@InjectRepository(User) private readonly userRepository: Repository<User>, private hashingService: HashingService) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await this.hashingService.hash(createUserDto.password);
@@ -41,16 +36,11 @@ export class UserService {
     return payload.lastName + payload.identifier.toString();
   }
 
-  async resetPassword(user: User) {
-    const temporaryPassword = this.passGenService.generatePassword();
-
-    const hashedPassword = await this.hashingService.hash(temporaryPassword);
+  async resetPassword(user: User, newPassword: string) {
+    const hashedPassword = await this.hashingService.hash(newPassword);
 
     await this.userRepository.update(user.id, {
       password: hashedPassword,
-      status: UserStatus.TemporaryPassword,
     });
-
-    return temporaryPassword;
   }
 }

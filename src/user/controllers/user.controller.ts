@@ -1,5 +1,5 @@
-import { Body, Controller, Post, UseGuards, UsePipes, Request, HttpCode, ValidationPipe } from "@nestjs/common";
-import { Get } from "@nestjs/common/decorators";
+import { Body, Query, Controller, Post, UseGuards, UsePipes, Request, HttpCode, ValidationPipe, ClassSerializerInterceptor } from "@nestjs/common";
+import { Get, UseInterceptors } from "@nestjs/common/decorators";
 import { AuthGuard } from "@nestjs/passport";
 import { MailService } from "src/mail/mail.service";
 import { CreateUserDto } from "../dto/create-user.dto";
@@ -9,6 +9,7 @@ import { User } from "../entities/user";
 import { LocalAuthGuard } from "../guards/local-auth.guard";
 import { AuthService } from "../services/auth.service";
 import { UserService } from "../services/user.service";
+import { DemandPasswordResetDto } from "../dto/demand-password-reset.dto";
 
 @Controller("user")
 export class UserController {
@@ -33,6 +34,7 @@ export class UserController {
 
   //* GET USER PROFILE
   @UseGuards(AuthGuard("jwt"))
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get("profile")
   //@UseInterceptors(TemporaryPasswordInterceptor)
   //@UseFilters(new ForbiddenFilter())
@@ -40,17 +42,33 @@ export class UserController {
     return req.user;
   }
 
-  //* RESET PASSWORD
+  //* REQUEST PASSWORD RESET
   @UsePipes(new ValidationPipe({ transform: true }))
-  @Post("reset-password")
-  @HttpCode(200)
-  async resetPassword(@Body() { email }: ResetPasswordDto) {
+  @Post("reset-password/request")
+  async requestPasswordReset(@Body() { email }: DemandPasswordResetDto) {
     const user = (await this.userService.findOne({ email })) as User;
+    const token = this.authService.generatePasswordResetToken(user);
+    const { firstName, lastName } = user;
 
-    const temporaryPassword = await this.userService.resetPassword(user);
-
-    await this.mailService.sendPasswordResetEmail(user.email, user.firstName, temporaryPassword);
+    this.mailService.sendPasswordResetEmail(user.email, { firstName, lastName }, token);
 
     return;
   }
+
+  //* RESET PASSWORD
+  @UseGuards(AuthGuard("password-reset"))
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @Post("reset-password")
+  @HttpCode(200)
+  async resetPassword(@Query("access_token") token: string, @Body() { newPassword }: ResetPasswordDto) {
+    const payload = (await this.authService.verifyToken(token)) as { sub: number };
+    const user = await this.userService.findById(payload.sub);
+    await this.userService.resetPassword(user as User, newPassword);
+
+    return;
+  }
+
+  //* CHANGE PASSWORD
+  @Post("change-password")
+  async changePassword() {}
 }

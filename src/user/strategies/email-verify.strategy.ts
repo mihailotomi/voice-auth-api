@@ -6,10 +6,10 @@ import { UserService } from "src/user/services/user.service";
 import { TokenType } from "../enums/token-type";
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
+export class EmailVerifyStrategy extends PassportStrategy(Strategy, "email-verify") {
   constructor(private configService: ConfigService, private userService: UserService) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromUrlQueryParameter("access_token"),
       ignoreExpiration: false,
       secretOrKey: configService.get<string>("JWT_SECRET"),
     });
@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
   async validate(payload: any) {
     const userId = payload.sub;
 
-    if (payload.type != TokenType.REGULAR) return false;
+    if (payload.type != TokenType.EMAIL_VERIFY) return false;
 
     return await this.userService.findById(userId);
   }

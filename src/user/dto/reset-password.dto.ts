@@ -1,9 +1,6 @@
-import { Validate } from "class-validator";
-import { EmailExistsConstraint } from "../constraints/email-exists.constraint";
-import { EmailValidator } from "../validators/email.validator";
+import { PasswordValidator } from "../validators/password.validator";
 
 export class ResetPasswordDto {
-  @EmailValidator()
-  @Validate(EmailExistsConstraint)
-  email: string;
+  @PasswordValidator()
+  newPassword: string;
 }

@@ -19,12 +19,15 @@ export class MailService {
     });
   }
 
-  async sendPasswordResetEmail(email: string, name: string, password: string) {
+  async sendPasswordResetEmail(email: string, name: { firstName: string; lastName: string }, token: string) {
+    const appHost = this.configService.get<string>("APP_HOST");
+    const href = `${appHost}/resert-password/?access_token=${token}`;
+
     await this.mailerService.sendMail({
       to: email,
-      subject: "Nova lozinka",
+      subject: "Promena lozinke",
       template: "./reset-password",
-      context: { password, name },
+      context: { name: `${name.firstName} ${name.lastName}`, href },
     });
   }
 }
