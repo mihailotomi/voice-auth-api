@@ -14,9 +14,9 @@ import { User } from "./entities/user";
 import { AuthService } from "./services/auth.service";
 import { UserService } from "./services/user.service";
 import { JwtStrategy } from "./strategies/jwt.strategy";
-import { LocalStrategy } from "./strategies/local.strategy";
 import { PasswordResetStrategy } from "./strategies/password-reset.strategy";
 import { EmailVerifyStrategy } from "./strategies/email-verify.strategy";
+import { LocalAuthGuard } from "./guards/local-auth.guard";
 
 @Module({
   imports: [
@@ -49,10 +49,12 @@ import { EmailVerifyStrategy } from "./strategies/email-verify.strategy";
     EmailExistsConstraint,
 
     //// strategies
-    LocalStrategy,
     JwtStrategy,
     PasswordResetStrategy,
     EmailVerifyStrategy,
+
+    //// guards
+    LocalAuthGuard,
   ],
 })
 export class UserModule {}

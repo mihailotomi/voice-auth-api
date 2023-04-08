@@ -6,6 +6,7 @@ import { User } from './user/entities/user';
 import { UserModule } from './user/user.module';
 import { HashingModule } from './hashing/hashing.module';
 import { MailModule } from './mail/mail.module';
+import { WorkingHoursModule } from './working-hours/working-hours.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { MailModule } from './mail/mail.module';
     }),
     HashingModule,
     MailModule,
+    WorkingHoursModule,
   ],
 })
 export class AppModule {}

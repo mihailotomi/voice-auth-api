@@ -1,4 +1,16 @@
-import { Body, Query, Controller, Post, Patch, UseGuards, UsePipes, Request, HttpCode, ValidationPipe, ClassSerializerInterceptor } from "@nestjs/common";
+import {
+  Body,
+  Query,
+  Controller,
+  Post,
+  Patch,
+  UseGuards,
+  UsePipes,
+  Request,
+  HttpCode,
+  ValidationPipe,
+  ClassSerializerInterceptor,
+} from "@nestjs/common";
 import { Get, UseInterceptors } from "@nestjs/common/decorators";
 import { AuthGuard } from "@nestjs/passport";
 import { MailService } from "src/mail/mail.service";
@@ -12,6 +24,9 @@ import { UserService } from "../services/user.service";
 import { DemandPasswordResetDto } from "../dto/demand-password-reset.dto";
 import { ChangePasswordDto } from "../dto/change-password.dto";
 import { PasswordChangeGuard } from "../guards/password-change.guard";
+import { ApiBearerAuth } from "@nestjs/swagger";
+import { Roles } from "../guards/roles.guard";
+import { Role } from "../enums/role";
 
 @Controller("user")
 export class UserController {
@@ -24,22 +39,29 @@ export class UserController {
     return await this.userService.createUser(body);
   }
 
+  //* REGISTER USER
+  @Roles(Role.ADMIN)
+  @UseGuards(AuthGuard("jwt"))
+  async register() {}
+
   //* LOGIN USER
   @UseGuards(LocalAuthGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post("login")
-  async login(@Body() loginUserDto: LoginUserDto) {
-    const user = await this.authService.validateUser(loginUserDto.username, loginUserDto.password);
+  //// Body is injected only to be documented by Swagger, but is validated in the guard
+  async login(@Body() loginUserDto: LoginUserDto, @Request() { user }: { user: User }) {
+    console.log(user);
+
     const token = this.authService.generateUserToken(user);
     return { user, token };
   }
 
   //* GET USER PROFILE
+  @ApiBearerAuth("JWT-auth")
   @UseGuards(AuthGuard("jwt"))
   @UseInterceptors(ClassSerializerInterceptor)
   @Get("profile")
-  //@UseInterceptors(TemporaryPasswordInterceptor)
-  //@UseFilters(new ForbiddenFilter())
   async profile(@Request() req: { user: any }) {
     return req.user;
   }
@@ -62,24 +84,27 @@ export class UserController {
   @UsePipes(new ValidationPipe({ transform: true }))
   @Post("reset-password")
   @HttpCode(200)
-  async resetPassword(@Query("access_token") token: string, @Body() { newPassword }: ResetPasswordDto) {
+  async resetPassword(@Query("access_token") token: string, @Body() { password }: ResetPasswordDto) {
     const payload = (await this.authService.verifyToken(token)) as { sub: number };
     const user = await this.userService.findById(payload.sub);
-    await this.userService.resetPassword(user as User, newPassword);
+    await this.userService.resetPassword(user as User, password);
 
     return;
   }
 
   //* CONFIRM EMAIL
   @UseGuards(AuthGuard("email-verify"))
-  @Post("verify-email")
+  @Patch("activate")
   @HttpCode(200)
-  async confirmEmail(@Query("access_token") token: string) {
+  async confirmEmail(@Query("access_token") token: string, @Body() { password }: ResetPasswordDto) {
     const payload = (await this.authService.verifyToken(token)) as { sub: number };
-    return await this.userService.activateUser(payload.sub);
+    const user = (await this.userService.findById(payload.sub)) as User;
+    await this.userService.resetPassword(user as User, password);
+    return await this.userService.activateUser(user?.id);
   }
 
   //* CHANGE PASSWORD
+  @ApiBearerAuth("JWT-auth")
   @UseGuards(AuthGuard("jwt"), PasswordChangeGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
   @Patch("change-password")

@@ -4,6 +4,8 @@ import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { UserService } from "src/user/services/user.service";
 import { TokenType } from "../enums/token-type";
+import { UserStatus } from "../enums/user-status";
+import { UserInactiveException } from "../exceptions/user-inactive.exception";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
@@ -20,6 +22,12 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
 
     if (payload.type != TokenType.REGULAR) return false;
 
-    return await this.userService.findById(userId);
+    const user = await this.userService.findById(userId);
+
+    if (user && user.status !== UserStatus.Active) {
+      throw new UserInactiveException();
+    }
+
+    return user;
   }
 }
