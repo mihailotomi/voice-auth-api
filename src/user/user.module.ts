@@ -12,7 +12,6 @@ import { UserExistsConstraint } from "./constraints/user-exists.constraint";
 import { UserController } from "./controllers/user.controller";
 import { User } from "./entities/user";
 import { AuthService } from "./services/auth.service";
-import { PasswordGeneratorService } from "./services/password-generator.service";
 import { UserService } from "./services/user.service";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { LocalStrategy } from "./strategies/local.strategy";
@@ -42,7 +41,6 @@ import { EmailVerifyStrategy } from "./strategies/email-verify.strategy";
     //// service
     UserService,
     AuthService,
-    PasswordGeneratorService,
 
     //// constraints
     EmailAvailableConstraint,

@@ -30,7 +30,11 @@ export class AuthService {
   }
 
   async verifyToken(token: string) {
-    return await this.jwtService.verify(token);
+    try {
+      return await this.jwtService.verify(token);
+    } catch (error) {
+      throw new UnauthorizedException();
+    }
   }
 
   generateUserToken(payload: User) {
@@ -48,13 +52,4 @@ export class AuthService {
   generatePasswordResetToken(payload: User) {
     return this.jwtService.sign({ sub: payload.id, type: TokenType.PASSWORD_RESET });
   }
-
-  // async verifyEmailToken(token: string) {
-  //   try {
-  //     const { id } = this.jwtService.verify<{ id: string }>(token);
-  //     await this.userService.findByIdAndUpdate(id, { active: true });
-  //   } catch (error) {
-  //     throw new BadRequestException('Unable to verify email');
-  //   }
-  // }
 }

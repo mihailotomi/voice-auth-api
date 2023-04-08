@@ -36,6 +36,20 @@ export class UserService {
     return payload.lastName + payload.identifier.toString();
   }
 
+  async activateUser(id: number) {
+    return await this.userRepository.update(id, { status: UserStatus.Active });
+  }
+
+  async changePassword(user: User, newPassword: string) {
+    const hashedPassword = await this.hashingService.hash(newPassword);
+
+    const updatedUser = await this.userRepository.update(user.id, {
+      password: hashedPassword,
+    });
+
+    return updatedUser;
+  }
+
   async resetPassword(user: User, newPassword: string) {
     const hashedPassword = await this.hashingService.hash(newPassword);
 

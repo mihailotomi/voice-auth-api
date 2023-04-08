@@ -9,7 +9,7 @@ export class MailService {
 
   async sendWelcomeEmail(email: string, name: { firstName: string; lastName: string }, token: string) {
     const appHost = this.configService.get<string>("APP_HOST");
-    const href = `${appHost}/confirm-email/${token}`;
+    const href = `${appHost}/confirm-email/?access_token=${token}`;
 
     await this.mailerService.sendMail({
       to: email,

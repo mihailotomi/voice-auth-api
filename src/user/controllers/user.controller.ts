@@ -1,4 +1,4 @@
-import { Body, Query, Controller, Post, UseGuards, UsePipes, Request, HttpCode, ValidationPipe, ClassSerializerInterceptor } from "@nestjs/common";
+import { Body, Query, Controller, Post, Patch, UseGuards, UsePipes, Request, HttpCode, ValidationPipe, ClassSerializerInterceptor } from "@nestjs/common";
 import { Get, UseInterceptors } from "@nestjs/common/decorators";
 import { AuthGuard } from "@nestjs/passport";
 import { MailService } from "src/mail/mail.service";
@@ -10,6 +10,8 @@ import { LocalAuthGuard } from "../guards/local-auth.guard";
 import { AuthService } from "../services/auth.service";
 import { UserService } from "../services/user.service";
 import { DemandPasswordResetDto } from "../dto/demand-password-reset.dto";
+import { ChangePasswordDto } from "../dto/change-password.dto";
+import { PasswordChangeGuard } from "../guards/password-change.guard";
 
 @Controller("user")
 export class UserController {
@@ -68,7 +70,20 @@ export class UserController {
     return;
   }
 
+  //* CONFIRM EMAIL
+  @UseGuards(AuthGuard("email-verify"))
+  @Post("verify-email")
+  @HttpCode(200)
+  async confirmEmail(@Query("access_token") token: string) {
+    const payload = (await this.authService.verifyToken(token)) as { sub: number };
+    return await this.userService.activateUser(payload.sub);
+  }
+
   //* CHANGE PASSWORD
-  @Post("change-password")
-  async changePassword() {}
+  @UseGuards(AuthGuard("jwt"), PasswordChangeGuard)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @Patch("change-password")
+  async changePassword(@Body() changePasswordDto: ChangePasswordDto, @Request() req: { user: User }) {
+    return await this.userService.changePassword(req.user, changePasswordDto.newPassword);
+  }
 }
