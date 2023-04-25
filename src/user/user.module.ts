@@ -8,7 +8,7 @@ import { MailModule } from "src/mail/mail.module";
 import { EmailAvailableConstraint } from "./constraints/email-available.constraint";
 import { EmailExistsConstraint } from "./constraints/email-exists.constraint";
 import { IdentifierAvailableConstraint } from "./constraints/identifier-available.constraint";
-import { UserExistsConstraint } from "./constraints/user-exists.constraint";
+import { UsernameExistsConstraint } from "./constraints/username-exists.constraint";
 import { UserController } from "./controllers/user.controller";
 import { User } from "./entities/user";
 import { AuthService } from "./services/auth.service";
@@ -17,6 +17,11 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
 import { PasswordResetStrategy } from "./strategies/password-reset.strategy";
 import { EmailVerifyStrategy } from "./strategies/email-verify.strategy";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
+import { MulterModule } from "@nestjs/platform-express/multer";
+import { TemporaryTokenStrategy } from "./strategies/temporary-token.strategy";
+import { CurrentUserGuard } from "./guards/current-user.guard";
+import { RolesGuard } from "./guards/roles.guard";
+import { PasswordChangeGuard } from "./guards/password-change.guard";
 
 @Module({
   imports: [
@@ -24,6 +29,9 @@ import { LocalAuthGuard } from "./guards/local-auth.guard";
     HashingModule,
     PassportModule,
     MailModule,
+    MulterModule.register({
+      dest: "./files",
+    }),
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => {
         return {
@@ -45,16 +53,20 @@ import { LocalAuthGuard } from "./guards/local-auth.guard";
     //// constraints
     EmailAvailableConstraint,
     IdentifierAvailableConstraint,
-    UserExistsConstraint,
+    UsernameExistsConstraint,
     EmailExistsConstraint,
 
     //// strategies
     JwtStrategy,
     PasswordResetStrategy,
     EmailVerifyStrategy,
+    TemporaryTokenStrategy,
 
     //// guards
     LocalAuthGuard,
+    CurrentUserGuard,
+    RolesGuard,
+    PasswordChangeGuard,
   ],
 })
 export class UserModule {}

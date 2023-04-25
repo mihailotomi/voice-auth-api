@@ -5,10 +5,15 @@ import { HashingService } from "src/hashing/hashing.service";
 import { TokenType } from "../enums/token-type";
 import { User } from "../entities/user";
 import { UserService } from "./user.service";
+import { Role } from "../enums/role";
 
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService, private hashingService: HashingService, private jwtService: JwtService) {}
+  constructor(
+    private userService: UserService,
+    private hashingService: HashingService,
+    private jwtService: JwtService
+  ) {}
 
   async validateUser(username: string, password: string) {
     const user = await this.userService.findOne({ username });
@@ -37,12 +42,26 @@ export class AuthService {
     }
   }
 
-  generateUserToken(payload: User) {
+  generateUserOrTempToken(user: User) {
+    const tokenType = user.role === Role.USER ? TokenType.REGULAR : TokenType.TEMPORARY;
+
     return this.jwtService.sign({
-      email: payload.email,
-      sub: payload.id,
+      email: user.email,
+      sub: user.id,
+      type: tokenType,
+    });
+  }
+
+  generateNontempToken(user: User) {
+    return this.jwtService.sign({
+      email: user.email,
+      sub: user.id,
       type: TokenType.REGULAR,
     });
+  }
+
+  async validateAdminVoice(file: Express.Multer.File) {
+    return true;
   }
 
   generateEmailVerifyToken(payload: User) {

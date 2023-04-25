@@ -8,15 +8,18 @@ import { UserStatus } from "../enums/user-status";
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(User) private readonly userRepository: Repository<User>, private hashingService: HashingService) {}
+  constructor(
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private hashingService: HashingService
+  ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<User> {
+  async createUser(createUserDto: CreateUserDto, status?: UserStatus): Promise<User> {
     const hashedPassword = await this.hashingService.hash(createUserDto.password);
     const payload = {
       ...createUserDto,
       username: this.inferUsername(createUserDto),
       password: hashedPassword,
-      status: UserStatus.Active,
+      status: status || UserStatus.Active,
     };
 
     const newUser = this.userRepository.create(payload);
@@ -37,17 +40,33 @@ export class UserService {
   }
 
   async activateUser(id: number) {
-    return await this.userRepository.update(id, { status: UserStatus.Active });
+    const updateResult = await this.userRepository
+      .createQueryBuilder()
+      .update(User, { status: UserStatus.Active })
+      .where("id = :id", { id })
+      .returning("*")
+      .updateEntity(true)
+      .execute();
+
+    const { password, ...userJson } = updateResult.raw[0];
+
+    return userJson;
   }
 
   async changePassword(user: User, newPassword: string) {
     const hashedPassword = await this.hashingService.hash(newPassword);
 
-    const updatedUser = await this.userRepository.update(user.id, {
-      password: hashedPassword,
-    });
+    const updateResult = await this.userRepository
+      .createQueryBuilder()
+      .update(User, { password: hashedPassword })
+      .where("id = :id", { id: user.id })
+      .returning("*")
+      .updateEntity(true)
+      .execute();
 
-    return updatedUser;
+    return {
+      rowsAffected: updateResult.affected,
+    };
   }
 
   async resetPassword(user: User, newPassword: string) {
