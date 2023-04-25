@@ -34,6 +34,7 @@ import { RegisterUserDto } from "../dto/register-user.dto";
 import { UserStatus } from "../enums/user-status";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { CurrentUserGuard } from "../guards/current-user.guard";
+import { UpdateUserDto } from "../dto/update-user.dto";
 
 @Controller("user")
 export class UserController {
@@ -106,8 +107,8 @@ export class UserController {
   @UseGuards(AuthGuard("jwt"), CurrentUserGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @UsePipes(new ValidationPipe({ transform: true }))
-  async update(@Param("id") id: string) {
-    return id;
+  async update(@Param("id") id: string, @Body() body: UpdateUserDto, @Request() req: { user: User }) {
+    return await this.userService.updateUser(req.user, body);
   }
 
   //* REQUEST PASSWORD RESET

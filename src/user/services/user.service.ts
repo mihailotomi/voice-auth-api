@@ -5,6 +5,7 @@ import { CreateUserDto } from "src/user/dto/create-user.dto";
 import { User } from "src/user/entities/user";
 import { Repository } from "typeorm";
 import { UserStatus } from "../enums/user-status";
+import { UpdateUserDto } from "../dto/update-user.dto";
 
 @Injectable()
 export class UserService {
@@ -39,6 +40,11 @@ export class UserService {
     return payload.lastName + payload.identifier.toString();
   }
 
+  mapToJson(user: User) {
+    const { password, ...rest } = user;
+    return rest;
+  }
+
   async activateUser(id: number) {
     const updateResult = await this.userRepository
       .createQueryBuilder()
@@ -48,9 +54,9 @@ export class UserService {
       .updateEntity(true)
       .execute();
 
-    const { password, ...userJson } = updateResult.raw[0];
+    const user = updateResult.raw[0] as User;
 
-    return userJson;
+    return this.mapToJson(user);
   }
 
   async changePassword(user: User, newPassword: string) {
@@ -67,6 +73,22 @@ export class UserService {
     return {
       rowsAffected: updateResult.affected,
     };
+  }
+
+  async updateUser(user: User, body: UpdateUserDto) {
+    let { password, ...payload } = { ...user, ...body };
+
+    const updateResult = await this.userRepository
+      .createQueryBuilder()
+      .update(User, { status: UserStatus.Active })
+      .where("id = :id", payload)
+      .returning("*")
+      .updateEntity(true)
+      .execute();
+
+    const updatedUser = updateResult.raw[0];
+
+    return this.mapToJson(updatedUser);
   }
 
   async resetPassword(user: User, newPassword: string) {
