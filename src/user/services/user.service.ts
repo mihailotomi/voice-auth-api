@@ -40,6 +40,7 @@ export class UserService {
     return payload.lastName + payload.identifier.toString();
   }
 
+  //// Manual mapping to json is
   mapToJson(user: User) {
     const { password, ...rest } = user;
     return rest;
@@ -75,7 +76,7 @@ export class UserService {
     };
   }
 
-  async updateUser(user: User, body: UpdateUserDto) {
+  async updateUser(user: User, body: UpdateUserDto): Promise<User> {
     let { password, ...payload } = { ...user, ...body };
 
     const updateResult = await this.userRepository
@@ -85,10 +86,9 @@ export class UserService {
       .returning("*")
       .updateEntity(true)
       .execute();
-
-    const updatedUser = updateResult.raw[0];
-
-    return this.mapToJson(updatedUser);
+    const updatedUser = updateResult.raw[0] as User;
+    return updatedUser;
+    // return this.mapToJson(updatedUser);
   }
 
   async resetPassword(user: User, newPassword: string) {

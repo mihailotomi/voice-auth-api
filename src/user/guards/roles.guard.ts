@@ -4,9 +4,9 @@ import { Role } from "../enums/role";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+  constructor(protected readonly reflector: Reflector) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const roles = this.reflector.get<Role[]>("roles", context.getHandler());
     if (!roles) {
       return true;

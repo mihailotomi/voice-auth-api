@@ -22,6 +22,7 @@ import { TemporaryTokenStrategy } from "./strategies/temporary-token.strategy";
 import { CurrentUserGuard } from "./guards/current-user.guard";
 import { RolesGuard } from "./guards/roles.guard";
 import { PasswordChangeGuard } from "./guards/password-change.guard";
+import { WorkingHours } from "src/working-hours/entities/working-hours";
 
 @Module({
   imports: [
@@ -68,5 +69,6 @@ import { PasswordChangeGuard } from "./guards/password-change.guard";
     RolesGuard,
     PasswordChangeGuard,
   ],
+  exports: [UserService, AuthService],
 })
 export class UserModule {}

@@ -9,7 +9,6 @@ import {
   Request,
   HttpCode,
   ValidationPipe,
-  ClassSerializerInterceptor,
   ParseFilePipe,
   FileTypeValidator,
   UnauthorizedException,
@@ -52,7 +51,6 @@ export class UserController {
   @Roles(Role.ADMIN)
   @UsePipes(new ValidationPipe({ transform: true }))
   @UseGuards(AuthGuard("jwt"), RolesGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
   async register(@Body() body: RegisterUserDto) {
     const user = await this.userService.createUser({ ...body, password: "@Nothing1" }, UserStatus.Inactive);
     const { firstName, lastName } = user;
@@ -85,7 +83,6 @@ export class UserController {
   @Post("login")
   @UseGuards(LocalAuthGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
-  @UseInterceptors(ClassSerializerInterceptor)
   //// Body is injected only to be documented by Swagger
   async login(@Body() loginUserDto: LoginUserDto, @Request() { user }: { user: User }) {
     const token = this.authService.generateUserOrTempToken(user);
@@ -96,18 +93,16 @@ export class UserController {
   @Get("profile")
   @ApiBearerAuth("JWT-auth")
   @UseGuards(AuthGuard("jwt"))
-  @UseInterceptors(ClassSerializerInterceptor)
-  async profile(@Request() req: { user: any }) {
-    return req.user;
+  async profile(@Request() { user }: { user: User }) {
+    return user;
   }
 
   //* UPDATE USER
-  @Patch("update/:id")
+  @Patch("update/:userId")
   @ApiBearerAuth("JWT-auth")
   @UseGuards(AuthGuard("jwt"), CurrentUserGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
   @UsePipes(new ValidationPipe({ transform: true }))
-  async update(@Param("id") id: string, @Body() body: UpdateUserDto, @Request() req: { user: User }) {
+  async update(@Param("userId") id: string, @Body() body: UpdateUserDto, @Request() req: { user: User }) {
     return await this.userService.updateUser(req.user, body);
   }
 

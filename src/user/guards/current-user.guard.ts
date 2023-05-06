@@ -10,7 +10,7 @@ export class CurrentUserGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const user = request.user as User;
-    const targetUserId = request.params.id;
+    const targetUserId = request.params.userId;
 
     if (!(await this.userService.findById(targetUserId))) {
       throw new BadRequestException("User doesn't exist");

@@ -1,8 +1,9 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Gender } from "../enums/gender";
 import { Role } from "../enums/role";
 import { UserStatus } from "../enums/user-status";
 import { Exclude } from "class-transformer";
+import { WorkingHours } from "src/working-hours/entities/working-hours";
 
 @Entity()
 export class User {
@@ -69,4 +70,7 @@ export class User {
     type: "smallint",
   })
   status: UserStatus;
+
+  @OneToMany(() => WorkingHours, (workingHours) => workingHours.user)
+  workingHoursHistory: WorkingHours[];
 }
