@@ -1,4 +1,4 @@
-import { Controller, Get, Post, UseGuards } from "@nestjs/common";
+import { Controller, Get, Post, Query, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { WorkingHoursService } from "../services/working-hours.service";
 import { AuthGuard } from "@nestjs/passport";
 import { ApiBearerAuth } from "@nestjs/swagger";
@@ -7,6 +7,7 @@ import { CurrentUserGuard } from "src/user/guards/current-user.guard";
 import { Role } from "src/user/enums/role";
 import { OwnerOrRoleGuard } from "../guards/owner-or-role.guard";
 import { WorkingHours } from "../entities/working-hours";
+import { PageOptionsDto } from "../dto/page-options.dto";
 
 @Controller("working-hours")
 export class WorkingHoursController {
@@ -23,5 +24,11 @@ export class WorkingHoursController {
   @UseGuards(AuthGuard("jwt"), OwnerOrRoleGuard)
   async getMyCurrent() {
     return 1;
+  }
+
+  @Get("list")
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async getList(@Query() query: PageOptionsDto) {
+    return await this.whService.search(query);
   }
 }

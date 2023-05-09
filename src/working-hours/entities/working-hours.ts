@@ -15,13 +15,13 @@ export class WorkingHours {
   @Column({ nullable: false })
   year: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, name: "num_hours" })
   numHours: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, name: "num_overtime" })
   numOvertime: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, name: "days_off" })
   daysOff: number;
 
   @ManyToOne(() => User, (user) => user.workingHoursHistory)
