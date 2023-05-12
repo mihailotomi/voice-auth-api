@@ -1,5 +1,5 @@
 import { ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface } from "class-validator";
-import { CompareOptions } from "../dto/page-options.dto";
+import { CompareOptions } from "../dto/working-hours-list.dto";
 
 @ValidatorConstraint()
 export class DateCompareConstraint implements ValidatorConstraintInterface {

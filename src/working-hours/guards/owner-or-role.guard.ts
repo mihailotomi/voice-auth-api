@@ -13,10 +13,6 @@ export class OwnerOrRoleGuard extends RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user as User;
 
-    if (request.params?.userId && request.params.userId === user.id) {
-      return true;
-    }
-
     if (request.params?.workingHoursId) {
       const workingHours = await this.whService.findById(request.params.workingHoursId);
       if (user.id === workingHours?.user.id) return true;

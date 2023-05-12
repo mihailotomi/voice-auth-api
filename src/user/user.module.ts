@@ -22,7 +22,7 @@ import { TemporaryTokenStrategy } from "./strategies/temporary-token.strategy";
 import { CurrentUserGuard } from "./guards/current-user.guard";
 import { RolesGuard } from "./guards/roles.guard";
 import { PasswordChangeGuard } from "./guards/password-change.guard";
-import { WorkingHours } from "src/working-hours/entities/working-hours";
+import { UserIdExistsConstraint } from "./constraints/user-id-exists.constraint";
 
 @Module({
   imports: [
@@ -56,6 +56,7 @@ import { WorkingHours } from "src/working-hours/entities/working-hours";
     IdentifierAvailableConstraint,
     UsernameExistsConstraint,
     EmailExistsConstraint,
+    UserIdExistsConstraint,
 
     //// strategies
     JwtStrategy,

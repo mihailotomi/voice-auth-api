@@ -5,6 +5,7 @@ import { User } from "src/user/entities/user";
 import { DateCompareConstraint } from "../constraints/date-compare.constraint";
 import { NumberCompareConstraint } from "../constraints/number-compare.constraint";
 import { Transform } from "class-transformer";
+import { UserIdExistsConstraint } from "src/user/constraints/user-id-exists.constraint";
 
 export type CompareOptions<T> = {
   gte: T;
@@ -36,7 +37,7 @@ const sortByOptions: (keyof SortByType)[] = [
   "username",
 ];
 
-export class PageOptionsDto {
+export class WorkingHoursListDto {
   @IsNumber()
   @IsOptional()
   pageSize: number = 10;
@@ -60,7 +61,9 @@ export class PageOptionsDto {
   @IsOptional()
   date?: CompareOptions<Date> | Date;
 
+  @Transform(({ value }) => parseInt(value as string), { toClassOnly: true })
   @IsNumber()
+  @Validate(UserIdExistsConstraint)
   @IsOptional()
   userId?: number;
 

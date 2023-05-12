@@ -4,7 +4,7 @@ import { WorkingHours } from "../entities/working-hours";
 import { Brackets, Repository } from "typeorm";
 import { UserService } from "src/user/services/user.service";
 import { User } from "src/user/entities/user";
-import { CompareOptions, PageOptionsDto } from "../dto/page-options.dto";
+import { CompareOptions, WorkingHoursListDto } from "../dto/working-hours-list.dto";
 
 @Injectable()
 export class WorkingHoursService {
@@ -13,7 +13,11 @@ export class WorkingHoursService {
     private userService: UserService
   ) {}
 
-  async findOne(payload: Partial<WorkingHours>) {
+  async findOne(payload: Partial<Omit<WorkingHours, "user"> & { userId: number }>) {
+    if (payload?.userId) {
+      const { userId, ...restPayload } = payload;
+      return await this.whRepository.findOne({ where: { user: { id: userId }, ...restPayload } });
+    }
     return await this.whRepository.findOneBy(payload);
   }
 
@@ -28,7 +32,7 @@ export class WorkingHoursService {
     return await this.whRepository.save(workingHours);
   }
 
-  async search(payload: PageOptionsDto) {
+  async search(payload: WorkingHoursListDto) {
     const query = this.whRepository.createQueryBuilder("working_hours");
 
     //// FILTERING
