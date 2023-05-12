@@ -23,6 +23,7 @@ import { CurrentUserGuard } from "./guards/current-user.guard";
 import { RolesGuard } from "./guards/roles.guard";
 import { PasswordChangeGuard } from "./guards/password-change.guard";
 import { UserIdExistsConstraint } from "./constraints/user-id-exists.constraint";
+import { HttpModule } from "@nestjs/axios";
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { UserIdExistsConstraint } from "./constraints/user-id-exists.constraint"
     HashingModule,
     PassportModule,
     MailModule,
+    HttpModule,
     MulterModule.register({
       dest: "./files",
     }),

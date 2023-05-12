@@ -1,18 +1,23 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-
+import { HttpService } from "@nestjs/axios/dist";
 import { HashingService } from "src/hashing/hashing.service";
 import { TokenType } from "../enums/token-type";
 import { User } from "../entities/user";
 import { UserService } from "./user.service";
 import { Role } from "../enums/role";
+import FormData from "form-data";
+import * as fs from "fs";
+
+import { lastValueFrom } from "rxjs";
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private hashingService: HashingService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private httpService: HttpService
   ) {}
 
   async validateUser(username: string, password: string) {
@@ -61,7 +66,14 @@ export class AuthService {
   }
 
   async validateAdminVoice(file: Express.Multer.File) {
-    return true;
+    const stream = fs.createReadStream(file.path);
+
+    const formData = new FormData();
+    formData.append("audio", stream);
+
+    const { data } = await lastValueFrom(this.httpService.post<boolean>("http://localhost:8000", formData));
+
+    return data;
   }
 
   generateEmailVerifyToken(payload: User) {
