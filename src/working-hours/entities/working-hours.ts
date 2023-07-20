@@ -24,7 +24,7 @@ export class WorkingHours {
   @Column({ nullable: false, name: "days_off" })
   daysOff: number;
 
-  @ManyToOne(() => User, (user) => user.workingHoursHistory)
+  @ManyToOne(() => User, (user) => user.workingHoursHistory, { eager: true })
   @JoinColumn({ name: "user_id" })
   user: User;
 }
