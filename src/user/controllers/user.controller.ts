@@ -63,7 +63,7 @@ export class UserController {
 
   //* LOGIN ADMIN 2F
   @Post("2f/admin")
-  @UseGuards(AuthGuard("temporary-token"))
+  @UseGuards(AuthGuard("temporary-token-admin"))
   @UseInterceptors(FileInterceptor("file"))
   async loginAdmin(
     @UploadedFile(new ParseFilePipe({ validators: [] }))

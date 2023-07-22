@@ -8,7 +8,7 @@ import { UserStatus } from "../enums/user-status";
 import { UserInactiveException } from "../exceptions/user-inactive.exception";
 
 @Injectable()
-export class TemporaryTokenStrategy extends PassportStrategy(Strategy, "temporary-token") {
+export class TemporaryTokenAdminStrategy extends PassportStrategy(Strategy, "temporary-token-admin") {
   constructor(private configService: ConfigService, private userService: UserService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -20,7 +20,7 @@ export class TemporaryTokenStrategy extends PassportStrategy(Strategy, "temporar
   async validate(payload: any) {
     const userId = payload.sub;
 
-    if (payload.type != TokenType.TEMPORARY) return false;
+    if (payload.type === TokenType.TEMPORARY_ADMIN) return false;
 
     const user = await this.userService.findById(userId);
 

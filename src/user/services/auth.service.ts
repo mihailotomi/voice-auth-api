@@ -48,7 +48,12 @@ export class AuthService {
   }
 
   generateUserOrTempToken(user: User) {
-    const tokenType = user.role === Role.USER ? TokenType.REGULAR : TokenType.TEMPORARY;
+    const tokenType =
+      user.role === Role.ADMIN
+        ? TokenType.TEMPORARY_ADMIN
+        : user.role === Role.OPERATOR
+        ? TokenType.TEMPORARY_OPERATOR
+        : TokenType.REGULAR;
 
     return this.jwtService.sign({
       email: user.email,

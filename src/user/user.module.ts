@@ -18,12 +18,13 @@ import { PasswordResetStrategy } from "./strategies/password-reset.strategy";
 import { EmailVerifyStrategy } from "./strategies/email-verify.strategy";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { MulterModule } from "@nestjs/platform-express/multer";
-import { TemporaryTokenStrategy } from "./strategies/temporary-token.strategy";
+import { TemporaryTokenAdminStrategy } from "./strategies/temporary-token-admin.strategy";
 import { CurrentUserGuard } from "./guards/current-user.guard";
 import { RolesGuard } from "./guards/roles.guard";
 import { PasswordChangeGuard } from "./guards/password-change.guard";
 import { UserIdExistsConstraint } from "./constraints/user-id-exists.constraint";
 import { HttpModule } from "@nestjs/axios";
+import { TemporaryTokenOperatorStrategy } from "./strategies/temporery-token-operator.strategy";
 
 @Module({
   imports: [
@@ -64,7 +65,8 @@ import { HttpModule } from "@nestjs/axios";
     JwtStrategy,
     PasswordResetStrategy,
     EmailVerifyStrategy,
-    TemporaryTokenStrategy,
+    TemporaryTokenAdminStrategy,
+    TemporaryTokenOperatorStrategy,
 
     //// guards
     LocalAuthGuard,
